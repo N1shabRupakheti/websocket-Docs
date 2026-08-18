@@ -9,5 +9,16 @@ services:
       - "3000:80"
     restart: unless-stopped
 
-
+  
+  app:
+    build: 
+      context: node
+      dockerfile: Dockerfile
+      
+    ports:
+      - "5000:5000"
     
+    environment:
+      - NODE_ENV=production
+
+    restart: unless-stopped
