@@ -1,0 +1,13 @@
+name: edocs
+
+services:
+  frontend:
+    build: 
+      context: edocs
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
+
+    
