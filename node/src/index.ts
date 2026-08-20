@@ -1,6 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { addClient, removeClient } from './clients';
 import { broadcast } from './broadcast';
+import { parseClientMessage, searilizeServerMessage } from './protocol';
 
 const PORT = 8080;
 
@@ -17,18 +18,34 @@ wss.on('connection', (socket: WebSocket, request) => {
     addClient(socket);
 
     socket.send(
-        JSON.stringify({
-            type: 'welcome',
-            message: 'Connected to server amigo de la chica del cafe',
+        searilizeServerMessage({
+            type: 'Willkommen Freund',
+            message: "Connected to the server"
         })
     );
 
     socket.on('message', (data, isBinary) => {
-        const message = isBinary
-            ? data
-            : data.toString();
 
-        console.log('Received:', message);
+        if (isBinary) {
+            return
+        }
+
+        const message = parseClientMessage(data.toString())
+
+        if (!message) {
+            console.log('Invalid message received');
+            return;
+        }
+
+        switch (message.type) {
+            case 'document_update':
+                console.log(
+                    'Document update:',
+                    message.content
+                );
+                break;
+        }
+
 
         socket.send(
             JSON.stringify({
