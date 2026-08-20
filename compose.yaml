@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:80"
+    
+    container_name: fend
     restart: unless-stopped
 
   
@@ -14,11 +16,17 @@ services:
     build: 
       context: node
       dockerfile: Dockerfile
+      target: production
       
+    container_name: bend
     ports:
-      - "5000:5000"
+      - "8080:8080"
     
     environment:
       - NODE_ENV=production
+
+    volumes:
+      - ./node:/app
+      - /app/node_modules # this simply means that we want to share the node_modules folder with the container
 
     restart: unless-stopped
