@@ -16,7 +16,7 @@ services:
     build: 
       context: node
       dockerfile: Dockerfile
-      target: production
+      target: development
       
     container_name: bend
     ports:
