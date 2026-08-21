@@ -1,13 +1,17 @@
-import { useEffect } from "react"
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
-const Connection = () => {
+const Connection = ({ content, onDocumentUpdate }: { content: string, onDocumentUpdate: (content: string) => void }) => {
 
     const [connection, setConnection] = useState(false)
 
+    // websocket reference
+    const wRef = useRef<WebSocket | null>(null);
+
     const backendURI = import.meta.env.VITE_BACKEND_URI_DEVELOPMENT;
     useEffect(() => {
+
         const ws = new WebSocket(backendURI);
+        wRef.current = ws
 
         ws.onopen = () => {
             console.log("WebSocket connected");
@@ -30,6 +34,22 @@ const Connection = () => {
             ws.close();
         };
     }, []);
+
+    const sendMessage = (content: string) => {
+        const ws = wRef.current;
+
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            console.log("Websocket is not open")
+            return;
+        }
+
+        const message = JSON.stringify({
+            type: "document_update",
+            content: content
+        });
+
+        ws.send(message);
+    }
 
 
     return (

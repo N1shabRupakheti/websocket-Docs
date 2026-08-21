@@ -2,19 +2,19 @@ import React, { useState, useRef, useEffect, ChangeEvent, KeyboardEvent } from "
 import { Moon, Sun } from "lucide-react";
 
 interface TextEditorProps {
-    initialValue?: string;
+    value?: string;
     onChange?: (value: string) => void;
     placeholder?: string;
     minRows?: number;
 }
 
 export const TextEditor: React.FC<TextEditorProps> = ({
-    initialValue = "",
+    value = "",
     onChange,
     placeholder = "Write your thoughts...",
     minRows = 18,
 }) => {
-    const [content, setContent] = useState<string>(initialValue);
+
     const [isDark, setIsDark] = useState<boolean>(() => {
         if (typeof window === "undefined") return false;
         const stored = localStorage.getItem("editor-theme");
@@ -35,12 +35,10 @@ export const TextEditor: React.FC<TextEditorProps> = ({
 
     useEffect(() => {
         adjustHeight();
-    }, [content]);
+    }, [value]);
 
     const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        const newValue = e.target.value;
-        setContent(newValue);
-        onChange?.(newValue);
+        onChange?.(e.target.value);
     };
 
     // Wrap highlighted text or drop a placeholder
@@ -50,13 +48,12 @@ export const TextEditor: React.FC<TextEditorProps> = ({
 
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
-        const selectedText = content.substring(start, end);
+        const selectedText = value.substring(start, end);
         const replacement = `${prefix}${selectedText || "text"}${suffix}`;
 
         const newContent =
-            content.substring(0, start) + replacement + content.substring(end);
+            value.substring(0, start) + replacement + value.substring(end);
 
-        setContent(newContent);
         onChange?.(newContent);
 
         requestAnimationFrame(() => {
@@ -77,9 +74,8 @@ export const TextEditor: React.FC<TextEditorProps> = ({
             const end = textarea.selectionEnd;
 
             const newContent =
-                content.substring(0, start) + "  " + content.substring(end);
+                value.substring(0, start) + "  " + value.substring(end);
 
-            setContent(newContent);
             onChange?.(newContent);
 
             requestAnimationFrame(() => {
@@ -88,8 +84,8 @@ export const TextEditor: React.FC<TextEditorProps> = ({
         }
     };
 
-    const charCount = content.length;
-    const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
+    const charCount = value.length;
+    const wordCount = value.trim() ? value.trim().split(/\s+/).length : 0;
 
     const toggleTheme = () => {
         setIsDark((prev) => {
@@ -166,7 +162,7 @@ export const TextEditor: React.FC<TextEditorProps> = ({
             {/* Editor Input Area */}
             <textarea
                 ref={textareaRef}
-                value={content}
+                value={value}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
