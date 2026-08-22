@@ -1,7 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { addClient, removeClient } from './clients';
 import { broadcast } from './broadcast';
-import { parseClientMessage, searilizeServerMessage } from './protocol';
+import { parseClientMessage, searilizeServerMessage, ServerMessage } from './protocol';
 
 const PORT = 8080;
 
@@ -47,20 +47,15 @@ wss.on('connection', (socket: WebSocket, request) => {
         }
 
 
-        socket.send(
-            JSON.stringify({
-                type: 'echo',
-                message,
-            })
-        );
+        const serverMessage: ServerMessage = {
+            type: 'document_update',
+            content: message.content
+        }
 
-        broadcast(
-            socket,
-            JSON.stringify({
-                type: 'broadcast',
-                message,
-            })
-        );
+        const searializedMessage = searilizeServerMessage(serverMessage)
+        socket.send(searializedMessage)
+        broadcast(socket, searializedMessage)
+
     });
 
     socket.on('close', (code, reason) => {
