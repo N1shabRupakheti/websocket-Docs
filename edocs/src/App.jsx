@@ -5,10 +5,12 @@ import { useState } from 'react'
 import useWebSocket from './hooks/useWebsocket.ts'
 
 
-function App() {
+function App() { 
 
   const [content, setContent] = useState('')
-  const { sendMessage } = useWebSocket();
+  const { sendMessage } = useWebSocket( {
+    onDocumentUpdate: setContent
+  } );
 
   const handleEditorChange = (newContent) => {
     setContent(newContent)

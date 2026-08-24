@@ -1,7 +1,12 @@
 import { useEffect, useState, useRef } from "react";
+import { parseServerMessage, ServerMessage } from "../websocket/protocol";
 
 
-const useWebSocket = () => {
+interface UseWebSocketParameter {
+    onDocumentUpdate?: (content: string) => void
+}
+
+const useWebSocket = ({ onDocumentUpdate }: UseWebSocketParameter = {}) => {
     const [connection, setConnection] = useState(false)
     const wRef = useRef<WebSocket | null>(null);
     const backendURI = import.meta.env.VITE_BACKEND_URI_DEVELOPMENT;
@@ -33,7 +38,32 @@ const useWebSocket = () => {
         };
 
         ws.onmessage = (event) => {
-            console.log("Message from server:", event.data);
+
+            try {
+
+                const message = parseServerMessage(event.data)
+
+                if (!message) {
+                    console.log('Invalid message returned from the server message parser')
+                    return
+                }
+
+                switch (message.type) {
+
+                    case "Willkommen Freund":
+                        console.log("Server:", message.message);
+                        break;
+
+                    case 'document_update':
+                        console.log('Document received : ', message.content)
+                        onDocumentUpdate?.(message.content)
+                        break;
+                }
+            }
+            catch (err) {
+                console.log('Error in Omessage handler WS. ', err)
+            }
+
         };
 
         ws.onerror = (error) => {
