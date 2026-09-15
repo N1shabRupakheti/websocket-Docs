@@ -1,8 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { addClient, removeClient } from './clients';
 import { broadcast } from './broadcast';
 import { parseClientMessage, searilizeServerMessage, ServerMessage } from './protocol';
-import { getRoomContent, setRoomContent } from './rooms';
+import { getRoomContent, joinRoom, leaveRoom, setRoomContent } from './rooms';
 import { URL } from 'node:url';
 
 const PORT = 8080;
@@ -42,7 +41,7 @@ wss.on('connection', (socket: WebSocket, request) => {
         return;
     }
 
-    addClient(socket, documentId);
+    joinRoom(documentId, socket);
 
     console.log(
         'Client connected:',
@@ -96,7 +95,7 @@ wss.on('connection', (socket: WebSocket, request) => {
             documentId
         );
 
-        removeClient(socket);
+        leaveRoom(documentId, socket);
     });
 
     socket.on('error', (err) => {

@@ -4,9 +4,10 @@ import { parseServerMessage, ServerMessage } from "../websocket/protocol";
 
 interface UseWebSocketParameter {
     onDocumentUpdate?: (content: string) => void
+    documentId?: string
 }
 
-const useWebSocket = ({ onDocumentUpdate }: UseWebSocketParameter = {}) => {
+const useWebSocket = ({ onDocumentUpdate, documentId }: UseWebSocketParameter = {}) => {
     const [connection, setConnection] = useState(false)
     const wRef = useRef<WebSocket | null>(null);
     const backendURI = import.meta.env.VITE_BACKEND_URI_DEVELOPMENT;
@@ -29,7 +30,7 @@ const useWebSocket = ({ onDocumentUpdate }: UseWebSocketParameter = {}) => {
 
     useEffect(() => {
 
-        const ws = new WebSocket(backendURI);
+        const ws = new WebSocket(`${backendURI}/document/${documentId}`);
         wRef.current = ws
 
         ws.onopen = () => {

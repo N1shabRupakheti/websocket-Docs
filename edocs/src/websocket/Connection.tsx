@@ -1,7 +1,8 @@
 import useWebSocket from "../hooks/useWebsocket";
 
 const Connection = () => {
-    const { connection } = useWebSocket()
+    const { connection } = useWebSocket({ documentId: '102' })
+
     return (
         <div
             role="alert"
